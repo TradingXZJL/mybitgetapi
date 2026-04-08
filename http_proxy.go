@@ -67,8 +67,8 @@ func isUseProxy() bool {
 
 func init() {
 	c := cron.New(cron.WithSeconds())
-	//每2秒权重清零，状态恢复
-	_, err := c.AddFunc("*/2 * * * * *", func() {
+	//每3秒权重清零，状态恢复
+	_, err := c.AddFunc("*/3 * * * * *", func() {
 		for _, proxy := range proxyList {
 			proxy.Weight.restore()
 		}
