@@ -505,3 +505,17 @@ func (api *PrivateRestClassicMarginIsolatedAccountQueryFlashRepayStatusAPI) IdLi
 	api.req.IdList = v
 	return api
 }
+
+type PrivateRestClassicMarginCrossAccountTierDataAPI struct {
+	client *PrivateRestClient
+	req    *PrivateRestClassicMarginCrossAccountTierDataReq
+}
+
+type PrivateRestClassicMarginCrossAccountTierDataReq struct {
+	Coin *string `json:"coin"` // 币种，如 BTC
+}
+
+func (api *PrivateRestClassicMarginCrossAccountTierDataAPI) Coin(v string) *PrivateRestClassicMarginCrossAccountTierDataAPI {
+	api.req.Coin = GetPointer(v)
+	return api
+}

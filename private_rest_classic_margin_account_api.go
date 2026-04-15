@@ -399,3 +399,16 @@ func (api *PrivateRestClassicMarginIsolatedAccountQueryFlashRepayStatusAPI) Do()
 	url := bitgetHandlerRequestAPIWithoutPathQueryParam(REST, PrivateRestClassicAPIMap[PrivateRestClassicMarginIsolatedAccountQueryFlashRepayStatus])
 	return bitgetCallApiWithSecret[PrivateRestClassicMarginIsolatedAccountQueryFlashRepayStatusRes](api.client.c, url, reqBody, POST)
 }
+
+// GET 全仓档位梯度配置
+func (client *PrivateRestClient) NewPrivateRestClassicMarginCrossAccountTierData() *PrivateRestClassicMarginCrossAccountTierDataAPI {
+	return &PrivateRestClassicMarginCrossAccountTierDataAPI{
+		client: client,
+		req:    &PrivateRestClassicMarginCrossAccountTierDataReq{},
+	}
+}
+
+func (api *PrivateRestClassicMarginCrossAccountTierDataAPI) Do() (*BitgetRestRes[PrivateRestClassicMarginCrossAccountTierDataRes], error) {
+	url := bitgetHandlerRequestAPIWithPathQueryParam(REST, api.req, PrivateRestClassicAPIMap[PrivateRestClassicMarginCrossAccountTierData])
+	return bitgetCallApiWithSecret[PrivateRestClassicMarginCrossAccountTierDataRes](api.client.c, url, NIL_REQBODY, GET)
+}

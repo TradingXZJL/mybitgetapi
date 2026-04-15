@@ -180,8 +180,6 @@ type PrivateRestClassicMarginIsolatedTradeFillItem struct {
 	FeeDetail  PrivateRestClassicMarginIsolatedTradeFeeDetail `json:"feeDetail"`  // 手续费明细
 }
 
-
-
 type PrivateRestClassicMarginIsolatedAccountAssetItem struct {
 	Symbol      string `json:"symbol"`      // 交易对名称
 	Coin        string `json:"coin"`        // 币种名称
@@ -293,3 +291,12 @@ type PrivateRestClassicMarginIsolatedAccountQueryFlashRepayStatusItem struct {
 }
 
 type PrivateRestClassicMarginIsolatedAccountQueryFlashRepayStatusRes []PrivateRestClassicMarginIsolatedAccountQueryFlashRepayStatusItem
+
+type PrivateRestClassicMarginCrossAccountTierDataResRow struct {
+	Tier                string `json:"tier"`                // 档位
+	Leverage            string `json:"leverage"`            // 有效杠杆倍数，全局默认3倍
+	Coin                string `json:"coin"`                // 币种
+	MaxBorrowableAmount string `json:"maxBorrowableAmount"` // 最大可借
+	MaintainMarginRate  string `json:"maintainMarginRate"`  // 维持保证金率
+}
+type PrivateRestClassicMarginCrossAccountTierDataRes []PrivateRestClassicMarginCrossAccountTierDataResRow

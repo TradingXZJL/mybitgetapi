@@ -75,6 +75,7 @@ const (
 	PrivateRestClassicMarginCrossAccountMaxBorrowableAmount   // GET 全仓最大可借数量
 	PrivateRestClassicMarginCrossAccountMaxTransferOutAmount  // GET 全仓最大可转出数量
 	PrivateRestClassicMarginCrossAccountInterestRateAndLimit  // GET 全仓利率与最大可借数量配置
+	PrivateRestClassicMarginCrossAccountTierData              // GET 全仓档位梯度配置
 	PrivateRestClassicMarginCrossAccountFlashRepay            // POST 全仓一键还款
 	PrivateRestClassicMarginCrossAccountQueryFlashRepayStatus // POST 获取全仓还款结果
 	PrivateRestClassicMarginCrossRecordBorrowHistory          // GET 获取全仓借款历史
@@ -179,6 +180,7 @@ var PrivateRestClassicAPIMap = map[PrivateRestClassicAPI]string{
 	PrivateRestClassicMarginCrossAccountMaxBorrowableAmount:   "/api/v2/margin/crossed/account/max-borrowable-amount",    // GET 全仓最大可借数量
 	PrivateRestClassicMarginCrossAccountMaxTransferOutAmount:  "/api/v2/margin/crossed/account/max-transfer-out-amount",  // GET 全仓最大可转出数量
 	PrivateRestClassicMarginCrossAccountInterestRateAndLimit:  "/api/v2/margin/crossed/interest-rate-and-limit",          // GET 全仓利率与最大可借数量配置
+	PrivateRestClassicMarginCrossAccountTierData:              "/api/v2/margin/crossed/tier-data",                        // GET 全仓档位梯度配置
 	PrivateRestClassicMarginCrossAccountFlashRepay:            "/api/v2/margin/crossed/account/flash-repay",              // POST 全仓一键还款
 	PrivateRestClassicMarginCrossAccountQueryFlashRepayStatus: "/api/v2/margin/crossed/account/query-flash-repay-status", // POST 获取全仓还款结果
 	PrivateRestClassicMarginCrossRecordBorrowHistory:          "/api/v2/margin/crossed/borrow-history",                   // GET 获取全仓借款历史

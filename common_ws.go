@@ -622,37 +622,42 @@ func (ws *WsStreamClient) reSubscribeForReconnect() error {
 	defer ws.reSubscribeMu.Unlock()
 
 	visited := map[*Subscription[WsActionResult]]bool{}
-	var firstErr error
-
+	snapshot := make([]*Subscription[WsActionResult], 0, 16)
 	ws.commonSubMap.Range(func(_ string, sub *Subscription[WsActionResult]) bool {
-		if sub == nil {
-			return true
-		}
-		if visited[sub] {
+		if sub == nil || visited[sub] {
 			return true
 		}
 		visited[sub] = true
-
-		reSub, err := subscribe[WsActionResult](ws, sub.Op, sub.Args)
-		if err != nil {
-			if firstErr == nil {
-				firstErr = err
-			}
-			return true
-		}
-		if err := ws.catchSubscribeResult(reSub); err != nil {
-			if firstErr == nil {
-				firstErr = err
-			}
-			return true
-		}
-		sub.SubId = reSub.SubId
-
-		time.Sleep(SUBSCRIBE_INTERVAL_TIME)
+		snapshot = append(snapshot, sub)
 		return true
 	})
 
-	return firstErr
+	isDoReSubscribe := map[int64]bool{}
+	var wErr error
+	for _, sub := range snapshot {
+		if _, ok := isDoReSubscribe[sub.SubId]; ok {
+			continue
+		}
+
+		reSub, err := subscribe[WsActionResult](ws, sub.Op, sub.Args)
+		if err != nil {
+			log.Error(err)
+			wErr = err
+			continue
+		}
+		err = ws.catchSubscribeResult(reSub)
+		if err != nil {
+			log.Error(err)
+			wErr = err
+			continue
+		}
+		log.Infof("reSubscribe Success: args:%v", reSub.Args)
+
+		sub.SubId = reSub.SubId
+		isDoReSubscribe[sub.SubId] = true
+		time.Sleep(SUBSCRIBE_INTERVAL_TIME)
+	}
+	return wErr
 }
 
 func (ws *WsStreamClient) DeferSub() {
@@ -716,21 +721,16 @@ func (ws *WsStreamClient) handleResult(resultChan chan []byte, errChan chan erro
 				if !ws.isClose && (strings.Contains(err.Error(), "EOF") ||
 					strings.Contains(err.Error(), "close") ||
 					strings.Contains(err.Error(), "reset")) {
-					// 避免并发多次重连（errChan 可能在短时间内连续上报）
-					if !atomic.CompareAndSwapInt32(&ws.reconnecting, 0, 1) {
-						continue
+					// 1) 收到断线错误后立刻尝试 OpenConn，失败则循环重试
+					// 2) OpenConn 成功后异步执行 Login（如需）和 reSubscribe
+					err := ws.OpenConn()
+					for err != nil {
+						time.Sleep(1500 * time.Millisecond)
+						err = ws.OpenConn()
 					}
+					ws.AutoReConnectTimes += 1
+
 					go func() {
-						defer atomic.StoreInt32(&ws.reconnecting, 0)
-
-						// 重连（带重试）
-						err := ws.OpenConn()
-						for err != nil {
-							time.Sleep(1500 * time.Millisecond)
-							err = ws.OpenConn()
-						}
-						ws.AutoReConnectTimes += 1
-
 						// 重新登陆（仅私有 WS 需要）
 						if ws.lastLogin != nil && ws.client != nil {
 							err = ws.Login(ws.client)
@@ -741,7 +741,8 @@ func (ws *WsStreamClient) handleResult(resultChan chan []byte, errChan chan erro
 						}
 
 						// 重新订阅
-						if err = ws.reSubscribeForReconnect(); err != nil {
+						err = ws.reSubscribeForReconnect()
+						if err != nil {
 							log.Error(err)
 						}
 					}()
